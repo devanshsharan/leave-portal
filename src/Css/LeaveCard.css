@@ -1,0 +1,65 @@
+.history-card {
+    
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+    margin-bottom: 10px;
+  }
+  
+  .row1 {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+  
+  .leaveType, .status {
+    flex-basis: 20%; /* Each takes 20% of available space */
+    text-align: center;
+  }
+  
+  .row11 {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    flex-basis: 40%; /* Center section takes 40% */
+  }
+  
+  .date {
+    width: 150px;
+    text-align: center;
+  }
+  
+  .cancel-button {
+    width: 120px;
+    flex-shrink: 0; /* Prevents button from shrinking */
+  }
+  
+  .arrow-icon {
+    cursor: pointer;
+    padding: 0 10px;
+  }
+  
+  .manager-responses {
+    margin-top: 10px;
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+  .manager-responses > h6{
+    color: #007bff;
+  }
+  
+  .leaveReason{
+    margin-bottom: 10px;
+  }
+
+  .response-inside1{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+  }
+  
+  
