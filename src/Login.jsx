@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Css/Loginpage.css';
 
@@ -7,6 +7,13 @@ function Login  () {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const jwt = localStorage.getItem('jwt');
+    if (jwt) {
+      navigate('/home');
+    }
+  }, [navigate]);
 
   const handleLogin = async (e) => {
     e.preventDefault();

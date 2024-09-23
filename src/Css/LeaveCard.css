@@ -61,5 +61,9 @@
     flex-direction: row;
     justify-content: space-between;
   }
-  
+  .cancel-reschedule-box{
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+  }
   

@@ -29,6 +29,8 @@ function ResponseCard({ response }) {
       });
 
       if (!res.ok) {
+        const errorData = await res.json();
+        alert(errorData.message || 'An error occurred');
         throw new Error('Failed to update response');
       }
 
@@ -65,13 +67,22 @@ function ResponseCard({ response }) {
         <div className="leaveType">{response.leaveRequest.employee.name}</div>
         <div className="row11">
           {isResponseChanged === "APPROVED" || isResponseChanged === "REJECTED" ? (
-            <button 
-              type="button" 
-              className="btn btn-secondary button3" 
-              disabled
-            >
-              {isResponseChanged}
-            </button>
+            <div className="button-box1">
+              <button 
+                type="button" 
+                className="btn btn-primary button2" 
+                disabled
+              >
+                {isResponseChanged}
+              </button>
+              <button
+                type="button"
+                className="btn btn-outline-primary button2"
+                onClick={() => handleClick('PENDING')}
+              >
+                Change
+              </button>
+            </div>
           ) : isResponseChanged === "CANCELLED" ? (
             <button 
               type="button" 
@@ -84,14 +95,14 @@ function ResponseCard({ response }) {
             <div className="button-box">
               <button
                 type="button"
-                className="btn btn-outline-primary button2"
+                className="btn btn-outline-primary button2 button5"
                 onClick={() => handleClick('APPROVED')}
               >
                 Approve
               </button>
               <button
                 type="button"
-                className="btn btn-outline-primary button2"
+                className="btn btn-outline-primary button2 button5"
                 onClick={() => handleClick('REJECTED')}
               >
                 Reject
@@ -122,6 +133,9 @@ function ResponseCard({ response }) {
 }
 
 export default ResponseCard;
+
+
+
 
 
 

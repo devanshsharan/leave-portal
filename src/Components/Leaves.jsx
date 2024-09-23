@@ -1,13 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import '../Css/Leaves.css';
-import LeaveCard from './LeaveCard';
+import LeaveCard from '../SubComponents/LeaveCard';
+import Pagination from '../SubComponents/Pagination';
+import LeaveForm from '../SubComponents/LeaveForm';
 
 function Leaves() {
     const [leaveDetails, setLeaveDetails] = useState(null);
-    const [leaveRequests, setLeaveRequests] = useState(null);
+    const [leaveRequests, setLeaveRequests] = useState([]); 
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
+    const [offset, setOffset] = useState(0);
+    const [pageSize, setPageSize] = useState(5);
+    const [totalPages, setTotalPages] = useState(1);
+    const [currentPage, setCurrentPage] = useState(1);
     const [formData, setFormData] = useState({
         employeeId: '',
         leaveStartDate: '',
@@ -49,7 +55,7 @@ function Leaves() {
                 const detailsData = await detailsResponse.json();
                 setLeaveDetails(detailsData);
 
-                const requestsResponse = await fetch(`http://localhost:8081/leaveRequestList/${employeeId}`, { 
+                const requestsResponse = await fetch(`http://localhost:8081/leaveRequestList/${employeeId}/${offset}/${pageSize}`, {
                     method: 'GET',
                     headers: {
                         'Authorization': `Bearer ${token}`,
@@ -63,7 +69,8 @@ function Leaves() {
                     throw new Error('Failed to fetch leave requests');
                 } else {
                     const requestsData = await requestsResponse.json();
-                    setLeaveRequests(requestsData);
+                    setLeaveRequests(requestsData.content);
+                    setTotalPages(requestsData.totalPages); 
                 }
 
             } catch (err) {
@@ -75,19 +82,10 @@ function Leaves() {
 
         fetchData();
 
-    }, [flag]); 
-
-    const handleFormChange = (e) => {
-        const { name, value } = e.target;
-        setFormData(prevFormData => ({
-            ...prevFormData,
-            [name]: value
-        }));
-    };
+    }, [offset, pageSize, flag]); 
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setShowModal(false);
         const token = localStorage.getItem('jwt');
 
         try {
@@ -101,25 +99,22 @@ function Leaves() {
             });
 
             if (!response.ok) {
-                throw new Error('Failed to apply for leave');
+                const errorData = await response.json();
+                alert(errorData.message);
+                throw new Error(errorData.message); 
             }
 
-            const result = await response.json();
-            
-
             setFlag(prev => !prev);
+            setShowModal(false);
 
         } catch (error) {
-            setError(error.message);
+            console.error(error);
         }
+        
     };
 
     if (loading) {
         return <p>Loading...</p>;
-    }
-
-    if (error) {
-        return <p>Error: {error}</p>;
     }
 
     return (
@@ -169,11 +164,21 @@ function Leaves() {
                 </div>
             </div>
             <div className="leave-history">
-                {leaveRequests !== null && leaveRequests.length > 0 ? (
-                    <div className="history-columns">
-                        {leaveRequests.map((leave, index) => (
-                            <LeaveCard key={index} leave={leave} />
-                        ))}
+                {leaveRequests.length > 0 ? (
+                    <div>
+                        <div className="history-columns">
+                            {leaveRequests.map((leave, index) => (
+                                <LeaveCard key={index} leave={leave} />
+                            ))}
+                        </div>
+                        <Pagination 
+                            setOffset={setOffset} 
+                            setCurrentPage={setCurrentPage} 
+                            setPageSize={setPageSize}
+                            currentPage={currentPage}
+                            totalPages={totalPages}
+                            pageSize={pageSize} 
+                        />
                     </div>
                 ) : (
                     <p>No leave history</p>
@@ -186,81 +191,19 @@ function Leaves() {
             >
                 <span className="plus-icon">+</span>
             </button>
-
-            
-            <div className={`modal fade ${showModal ? 'show' : ''}`} id="applyLeaveModal" tabIndex="-1" aria-labelledby="applyLeaveModalLabel" aria-hidden={!showModal}>
-                <div className="modal-dialog">
-                    <div className="modal-content">
-                        <div className="modal-header">
-                            <h5 className="modal-title" id="applyLeaveModalLabel">Apply for Leave</h5>
-                            <button type="button" className="btn-close" onClick={() => setShowModal(false)} aria-label="Close"></button>
-                        </div>
-                        <form onSubmit={handleSubmit}>
-                            <div className="modal-body">
-                                <div className="mb-3">
-                                    <label htmlFor="leaveStartDate" className="form-label">Start Date</label>
-                                    <input
-                                        type="date"
-                                        id="leaveStartDate"
-                                        name="leaveStartDate"
-                                        className="form-control"
-                                        value={formData.leaveStartDate}
-                                        onChange={handleFormChange}
-                                        required
-                                    />
-                                </div>
-                                <div className="mb-3">
-                                    <label htmlFor="leaveEndDate" className="form-label">End Date</label>
-                                    <input
-                                        type="date"
-                                        id="leaveEndDate"
-                                        name="leaveEndDate"
-                                        className="form-control"
-                                        value={formData.leaveEndDate}
-                                        onChange={handleFormChange}
-                                        required
-                                    />
-                                </div>
-                                <div className="mb-3">
-                                    <label htmlFor="leaveType" className="form-label">Leave Type</label>
-                                    <select
-                                        id="leaveType"
-                                        name="leaveType"
-                                        className="form-control"
-                                        value={formData.leaveType}
-                                        onChange={handleFormChange}
-                                        required
-                                    >
-                                        <option value="">Select Leave Type</option>
-                                        <option value="CASUAL">Casual Leave</option>
-                                        <option value="HOSPITALIZATION">Hospitalization Leave</option>
-                                    </select>
-                                </div>
-                                <div className="mb-3">
-                                    <label htmlFor="leaveReason" className="form-label">Leave Reason</label>
-                                    <textarea
-                                        id="leaveReason"
-                                        name="leaveReason"
-                                        className="form-control"
-                                        value={formData.leaveReason}
-                                        onChange={handleFormChange}
-                                        required
-                                    />
-                                </div>
-                            </div>
-                            <div className="modal-footer">
-                                <button type="button" className="btn btn-secondary" onClick={() => setShowModal(false)}>Close</button>
-                                <button type="submit" className="btn btn-primary">Submit</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
+            <LeaveForm 
+                handleSubmit={handleSubmit} 
+                setFormData={setFormData} 
+                formData={formData} 
+                setShowModal={setShowModal} 
+                showModal={showModal} 
+            />
         </div>
     );
 }
 
 export default Leaves;
+
 
 
 
