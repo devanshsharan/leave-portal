@@ -21,7 +21,7 @@ function Header() {
 
     const fetchNotifications = async () => {
         try {
-            const response = await fetch(`/api/notifications/uncleared/${employeeId}`, {
+            const response = await fetch(`http://localhost:8081/uncleared/${employeeId}`, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${jwtToken}`, 
@@ -32,7 +32,6 @@ function Header() {
                 throw new Error('Network response was not ok');
             }
             const data = await response.json();
-            console.log(data);
             setNotifications(data); 
         } catch (error) {
             console.error("Error fetching notifications:", error);
@@ -45,9 +44,12 @@ function Header() {
     };
 
     const handleClearNotifications = async () => {
-        
         setNotifications([]); 
-        
+    };
+
+    const handleNotificationClick = (notification) => {
+        console.log(`Notification clicked: ${notification.id}`);
+        // Add any logic here to handle notification click (e.g., navigate to a specific page)
     };
 
     return (
@@ -64,9 +66,16 @@ function Header() {
                                 <li>No notifications</li>
                             ) : (
                                 notifications.map(notification => (
-                                    <li key={notification.id}>
-                                        
-                                        {notification.type}: {notification.leaveRequest.id}
+                                    <li key={notification.id} onClick={() => handleNotificationClick(notification)}>
+                                        {notification.type === 'REQUEST' ? (
+                                            <>
+                                                A leave request from {notification.leaveRequest.employee.name}
+                                            </>
+                                        ) : (
+                                            <>
+                                                Your leave request from {notification.leaveRequest.leaveStartDate} to {notification.leaveRequest.leaveEndDate} has been {notification.leaveRequest.status}
+                                            </>
+                                        )}
                                     </li>
                                 ))
                             )}
@@ -81,4 +90,6 @@ function Header() {
 }
 
 export default Header;
+
+
 

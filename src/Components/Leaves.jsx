@@ -109,6 +109,13 @@ function Leaves() {
 
             setFlag(prev => !prev);
             setShowModal(false);
+            setFormData({
+                employeeId: '',
+                leaveStartDate: '',
+                leaveEndDate: '',
+                leaveType: '',
+                leaveReason: ''
+            });
 
         } catch (error) {
             console.error(error);
