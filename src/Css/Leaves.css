@@ -5,8 +5,10 @@
   .leave-cards {
     display: flex;
     width: 1000px;
-    justify-content: space-between;
+    justify-content: space-around;
+    margin-left: 25px;
     gap: 40px;
+
   }
   
   .leave-card {

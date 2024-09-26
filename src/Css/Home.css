@@ -1,13 +1,42 @@
-/* src/Home.css */
-.main-container {
-    display: flex;
-  }
-  
-  .content {
-    flex-grow: 1;
-    padding: 20px;
+.layout {
+    display: grid;
+    grid-template-areas:
+      "header header"
+      "sidebar content";
+    grid-template-rows: 80px auto;
+    grid-template-columns: 250px 1fr;
+    height: 100vh;
+    overflow: hidden; 
     
-    height: 100vh; 
-    box-sizing: border-box; 
-  }
-  
+}
+
+.header {
+    grid-area: header;
+    background-color: #FFFFFF;
+    position: fixed; 
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 80px; 
+    z-index: 1000; 
+}
+
+.sidebar {
+    grid-area: sidebar;
+    background-color: #F0F0F0;
+    position: fixed; 
+    top: 80px; 
+    left: 0;
+    width: 250px; 
+    height: calc(100vh - 80px); 
+    overflow-y: auto; 
+}
+
+
+.content {
+    grid-area: content;
+    overflow-y: auto; 
+    height: calc(100vh - 80px); 
+    
+}
+

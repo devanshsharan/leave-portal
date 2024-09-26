@@ -15,7 +15,7 @@
   }
   
   .leaveType, .status {
-    flex-basis: 20%; /* Each takes 20% of available space */
+    flex-basis: 20%; 
     text-align: center;
   }
   
@@ -25,17 +25,17 @@
     justify-content: center;
     align-items: center;
     gap: 10px;
-    flex-basis: 40%; /* Center section takes 40% */
+    flex-basis: 40%; 
   }
   
   .date {
-    width: 150px;
+    width: 250px;
     text-align: center;
   }
   
   .cancel-button {
     width: 120px;
-    flex-shrink: 0; /* Prevents button from shrinking */
+    flex-shrink: 0; 
   }
   
   .arrow-icon {
@@ -50,20 +50,75 @@
   }
   .manager-responses > h6{
     color: #007bff;
+    margin-left: 180px;
   }
   
   .leaveReason{
     margin-bottom: 10px;
+    margin-left: 180px;
+    margin-right: 160px;
   }
 
-  .response-inside1{
+  .response-inside1 {
     display: flex;
-    flex-direction: row;
-    justify-content: space-between;
+    align-items: center; 
+    justify-content: space-around; 
+  }
+  .response-inside1 > div{
+    width: 280px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
   .cancel-reschedule-box{
     display: flex;
     flex-direction: row;
     gap: 10px;
   }
+  .icons-design{
+    display: flex;
+    gap: 15px;
+  }
+  .leave-reason2{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .leave-reason-heading{
+    color: green;
+  }
+  
+.status {
+    font-weight: bold;
+    padding: 5px;
+    border-radius: 4px;
+}
+
+.status.pending {
+    color: orange;
+}
+
+.status.approved {
+    color: green;
+}
+
+.status.rejected {
+    color: red;
+}
+
+.status.cancelled {
+    color: gray;
+}
+.btn-outline-success {
+  border-color: #2cf05a; 
+  color: #2cf05a;
+ 
+}
+
+.btn-outline-success:hover {
+  background-color: #2cf05a;
+  border-color: #2cf05a;
+}
+
+  
   

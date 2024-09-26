@@ -30,6 +30,7 @@ function Dashboard() {
         }
 
         const data = await response.json();
+        console.log(data);
         setEmployee(data);
       } catch (err) {
         setError(err.message);

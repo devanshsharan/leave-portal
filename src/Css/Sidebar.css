@@ -1,17 +1,14 @@
-/* src/Sidebar.css */
 .sidebar {
-  width: 250px; /* Adjust width as needed */
-  background-color: #f4f4f4; /* Adjust background color as needed */
+  width: 250px;
+  background-color: #f4f4f4;
   padding: 20px;
-  height: 100vh; /* Full viewport height */
+  height: 100vh;
   display: flex;
   flex-direction: column;
-  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1); 
-}
-
-.sidebar-title {
-  font-size: 1.5rem;
-  margin-bottom: 20px;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+  transition: width 0.3s ease; 
+  margin-top: 20px;
+  border-radius: 2%;
 }
 
 .sidebar-menu {
@@ -28,19 +25,39 @@
   text-decoration: none;
   color: #333;
   font-size: 1.2em;
-  display: block;
+  display: flex; /* Use flexbox for icon and text alignment */
+  align-items: center; /* Center items vertically */
   padding: 10px;
   border-radius: 5px;
+  transition: background-color 0.3s ease, color 0.3s ease; /* Smooth color transition */
 }
 
 .sidebar-item a:hover {
-  background-color: #ddd;
+  background-color: #ccc; /* Light gray background on hover */
+  color: #000; /* Darker text color on hover */
 }
 
 .sidebar-item.active a {
-  background-color: #708090;
-  color: white;
+  background-color: #bbb; /* Slate gray for active item */
+  color: #000; /* White text for active item */
 }
+
+.sidebar-item a svg {
+  margin-right: 10px; /* Space between icon and text */
+  font-size: 1.5em; /* Increase icon size */
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .sidebar {
+    width: 200px; /* Reduce sidebar width on smaller screens */
+  }
+  .sidebar-item a {
+    font-size: 1em; /* Smaller font size for mobile */
+  }
+}
+
+
 /*.content {
   flex-grow: 1;
   padding: 20px;

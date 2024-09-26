@@ -1,12 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import '../Css/LeaveCard.css';
 import LeaveForm from './LeaveForm';
+import { GiSandsOfTime } from "react-icons/gi";
+import { FaCheckCircle } from "react-icons/fa";
+import { GiSkullCrossedBones } from "react-icons/gi";
+import { FcCancel } from "react-icons/fc";
+import { FaAnglesDown,FaAnglesUp } from "react-icons/fa6";
+import useFetchManagerResponses from '../CustomHooks/useFetchManagerResponses';
 
 function LeaveCard({ leave }) {
     const [leaveDynamic, setLeaveDynamic] = useState(leave);
-    const [managerResponses, setManagerResponses] = useState([]);
-    const [error, setError] = useState(null);
-    const [loading, setLoading] = useState(true);
+    const [error1, setError1] = useState(null);
+    const [loading1, setLoading1] = useState(true);
     const [showResponses, setShowResponses] = useState(false);
     const [isCancelled, setIsCancelled] = useState(false);
     const [showModal, setShowModal] = useState(false);
@@ -19,22 +24,34 @@ function LeaveCard({ leave }) {
         leaveReason: ''
     });
 
-    useEffect(() => {
-        setFormData(prevFormData => ({
-            ...prevFormData,
-            leaveRequestId: leave.id
-        }));
-    }, [leave.id]);
+    const { managerResponses, error, loading, fetchManagerResponses } = useFetchManagerResponses();
 
     useEffect(() => {
         setLeaveDynamic(leave);
     }, [leave]);
 
     useEffect(() => {
+        setFormData(prevFormData => ({
+            ...prevFormData,
+            leaveRequestId: leaveDynamic.id,
+            leaveStartDate: leaveDynamic.leaveStartDate,
+            leaveEndDate: leaveDynamic.leaveEndDate,
+            leaveType: leaveDynamic.leaveType,
+            leaveReason: leaveDynamic.leaveReason
+        }));
+    }, [leave.id,showModal]);
+
+    useEffect(() => {
         setIsCancelled(leave.status === 'CANCELLED');
     }, [leave.status]);
 
     useEffect(() => {
+        if (leaveDynamic.id) {
+            fetchManagerResponses(leaveDynamic.id);
+        }
+    }, [leave.id, flag,fetchManagerResponses]);
+
+    /*useEffect(() => {
         const fetchManagerResponses = async () => {
             const token = localStorage.getItem('jwt');
 
@@ -68,7 +85,7 @@ function LeaveCard({ leave }) {
             }
         };
         fetchManagerResponses();
-    }, [flag, leave.id]);
+    }, [flag, leave.id]);*/
 
     const handleToggleResponses = () => {
         setShowResponses(!showResponses);
@@ -88,10 +105,24 @@ function LeaveCard({ leave }) {
         return `${day} ${monthAbbreviations[month - 1]} ${year}`; 
     };
 
+    const getResponseIcon = (response) => {
+        switch (response) {
+            case 'APPROVED':
+                return <FaCheckCircle style={{ color: '#28A745' }} />;
+            case 'REJECTED':
+                return <GiSkullCrossedBones style={{ color: '#DC3545' }} />;
+            case 'CANCELLED':
+                return <FcCancel />;
+            case 'PENDING':
+            default:
+                return <GiSandsOfTime style={{ color: '#FFA500' }} />;
+        }
+    };
+
     const handleCancel = async () => {
         const token = localStorage.getItem('jwt');
         if (!token) {
-            setError('No token found');
+            setError1('No token found');
             return;
         }
 
@@ -113,7 +144,7 @@ function LeaveCard({ leave }) {
 
         } catch (error) {
             console.error('Error cancelling leave:', error);
-            setError('Error cancelling leave');
+            setError1('Error cancelling leave');
         }
     };
 
@@ -149,7 +180,7 @@ function LeaveCard({ leave }) {
 
         } catch (error) {
             console.log(error);
-            setLoading(false);
+            setLoading1(false);
         }
     };
 
@@ -166,34 +197,45 @@ function LeaveCard({ leave }) {
             <div className="row1">
                 <div className="leaveType">{leaveDynamic.leaveType}</div>
                 <div className="row11">
-                    <div className="date">{formatDate(leaveDynamic.requestDate)}</div>
-                    {isCancelled ? (
-                        <button type="button" className="btn btn-secondary cancel-button" disabled>
-                            Cancelled
+                    <div className="date">
+                        {leaveDynamic.leaveStartDate === leaveDynamic.leaveEndDate ? (
+                            formatDate(leaveDynamic.leaveStartDate) 
+                        ) : (
+                            `${formatDate(leaveDynamic.leaveStartDate)} - ${formatDate(leaveDynamic.leaveEndDate)}` 
+                        )}
+                    </div>
+                    <div className="cancel-reschedule-box">
+                        <button
+                            type="button"
+                            className="btn btn-outline-danger cancel-button"
+                            onClick={handleCancel}
+                            disabled={isCancelled}
+                        >
+                            Cancel
                         </button>
-                    ) : (
-                        <div className="cancel-reschedule-box">
-                            <button
-                                type="button"
-                                className="btn btn-outline-danger cancel-button"
-                                onClick={handleCancel}
-                            >
-                                Cancel
-                            </button>
-                            <button
-                                type="button"
-                                className="btn btn-outline-danger cancel-button"
-                                onClick={handleClick}
-                            >
-                                Reschedule
-                            </button>
-                        </div>
-                    )}
+                        <button
+                            type="button"
+                            className="btn btn-outline-success cancel-button"
+                            onClick={handleClick}
+                            disabled={isCancelled}
+                        >
+                            Reschedule
+                        </button>
+                    </div>
+                    
                     <div className="arrow-icon" onClick={handleToggleResponses}>
-                        {showResponses ? '∧' : 'v'}
+                        {showResponses ? <FaAnglesUp /> : <FaAnglesDown />}
                     </div>
                 </div>
-                <div className="status">{isCancelled ? 'CANCELLED' : leaveDynamic.status}</div>
+                <div className={`icons-design status ${isCancelled ? 'cancelled' : leaveDynamic.status.toLowerCase()}`}>
+                     <span>
+                         {isCancelled ? 'CANCELLED' : leaveDynamic.status}
+                     </span>
+                     <span>
+                         {getResponseIcon(isCancelled ? 'CANCELLED' : leaveDynamic.status)}
+                     </span>
+                </div>
+
             </div>
 
             {showResponses && (
@@ -204,13 +246,24 @@ function LeaveCard({ leave }) {
                         <p>{error}</p>
                     ) : managerResponses.length > 0 ? (
                         <div className="manager-responses">
-                            <div className="leaveReason">{leaveDynamic.leaveReason}</div>
+                            <div className="leave-reason2 leaveReason">
+                                <div className="leave-reason-heading">Leave Reason:</div>
+                                <div>{leaveDynamic.leaveReason}</div>
+                            </div>
                             <h6>Approval Status:</h6>
                             {managerResponses.map((response, index) => (
                                 <div key={index} className="response-card1">
                                     <div className="response-inside1">
                                         <div>{response.manager.name}</div>
-                                        <div>{response.response}</div>
+                                        <div>{isCancelled ? 'No Comments' :response.comments}</div>
+                                        <div className={`icons-design status ${isCancelled ? 'cancelled' : response.response.toLowerCase()}`}>
+                                             <span>
+                                                 {isCancelled ? 'CANCELLED' : response.response}
+                                             </span>
+                                             <span>
+                                                 {getResponseIcon(isCancelled ? 'CANCELLED' : response.response)}
+                                             </span>
+                                        </div>
                                     </div>
                                 </div>
                             ))}

@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import '../Css/Leaves.css';
-import LeaveCard from '../SubComponents/LeaveCard';
-import Pagination from '../SubComponents/Pagination';
-import LeaveForm from '../SubComponents/LeaveForm';
+import LeaveCard from '../RightContent/LeaveCard';
+import Pagination from '../RightContent/Pagination';
+import LeaveForm from '../RightContent/LeaveForm';
 
 function Leaves() {
     const [leaveDetails, setLeaveDetails] = useState(null);
@@ -64,13 +64,16 @@ function Leaves() {
                 });
 
                 if (requestsResponse.status === 204) {
+                    console.log("here1");
                     setLeaveRequests([]); 
                 } else if (!requestsResponse.ok) {
+                   console.log(here2);
                     throw new Error('Failed to fetch leave requests');
                 } else {
                     const requestsData = await requestsResponse.json();
                     setLeaveRequests(requestsData.content);
                     setTotalPages(requestsData.totalPages); 
+                    console.log(requestsData);
                 }
 
             } catch (err) {

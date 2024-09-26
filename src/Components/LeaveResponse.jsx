@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import ResponseCard from '../SubComponents/ResponseCard';
-import Pagination from '../SubComponents/Pagination';
+import ResponseCard from '../RightContent/ResponseCard';
+import Pagination from '../RightContent/Pagination';
+import '../Css/LeaveResponse.css';
 
 
 function LeaveResponse() {
@@ -69,8 +70,8 @@ function LeaveResponse() {
     }
 
     return (
-        <div>
-            <h1>Leave Responses</h1>
+        <div className="responselayout">
+
             {responses.length > 0 ? (
                 <div>
                     <div className="history-columns">

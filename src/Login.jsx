@@ -57,6 +57,7 @@ function Login  () {
         <div>
           <label>Username: </label>
           <input
+            className="login-input"
             type="text"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
@@ -65,6 +66,7 @@ function Login  () {
         <div>
           <label>Password: </label>
           <input
+            className="login-input"
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
