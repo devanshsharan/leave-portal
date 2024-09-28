@@ -35,8 +35,11 @@
     background-color: white;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     border-radius: 8px;
+    max-height: 300px; /* Limit the height */
+    overflow-y: auto;
     z-index: 1000;
     padding: 10px;
+    
 }
 
 .notification-dropdown ul {
@@ -54,16 +57,21 @@
 .notification-dropdown li:last-child {
     border-bottom: none;
 }
-
-.notification-dropdown button {
-    width: 100%;
-    padding: 10px;
-    background-color: #f8f8f8;
+.clear-button {
+    padding: 5px 10px; /* Reduced padding for a shorter button */
+    background-color: rgb(255, 0, 0); /* Red background */
+    color: white; /* Change text color to white for contrast */
     border: none;
-    cursor: pointer;
     border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    width: auto; /* Let the button's width be determined by its content */
+    font-weight: bold; /* Make the text bold */
+    margin-left: 70%;
 }
 
-.notification-dropdown button:hover {
-    background-color: #e0e0e0;
+.clear-button:hover {
+    background-color: #c9302c; /* Darker shade on hover */
 }
+
+

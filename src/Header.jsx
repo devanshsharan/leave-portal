@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom'; 
 import './Css/Header.css';
 import logo from './assets/beehyvlogo.png';
@@ -10,6 +10,8 @@ function Header() {
     const [showNotifications, setShowNotifications] = useState(false);
     const employeeId = localStorage.getItem('employeeId'); 
     const jwtToken = localStorage.getItem('jwt'); 
+    const dropdownRef = useRef(null);
+    const bellRef = useRef(null);
 
     const handleLogout = () => {
         localStorage.removeItem('jwt');
@@ -38,19 +40,69 @@ function Header() {
         }
     };
 
+    const postStatusUpdate = async (status) => {
+        try {
+            const response = await fetch('http://localhost:8081/updateStatus', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${jwtToken}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    employeeId: employeeId,
+                    response: status
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to update notification status');
+            }
+            const result = await response.text();
+            console.log(result);
+        } catch (error) {
+            console.error("Error sending status update:", error);
+        }
+    };
+
     const handleBellClick = () => {
-        fetchNotifications(); 
-        setShowNotifications(!showNotifications); 
+        if (!showNotifications) {
+            fetchNotifications();
+        } else if(notifications.length > 0){
+            postStatusUpdate("SEEN");
+        }
+        setShowNotifications(prev => !prev);
     };
 
     const handleClearNotifications = async () => {
-        setNotifications([]); 
+        if (notifications.length > 0) { 
+            setNotifications([]); 
+            await postStatusUpdate("CLEARED"); 
+        }
     };
 
     const handleNotificationClick = (notification) => {
         console.log(`Notification clicked: ${notification.id}`);
-        // Add any logic here to handle notification click (e.g., navigate to a specific page)
     };
+
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (
+                dropdownRef.current && !dropdownRef.current.contains(event.target) &&
+                bellRef.current && !bellRef.current.contains(event.target)
+            ) {
+                setShowNotifications(false);
+                if(notifications.length > 0){
+                    postStatusUpdate("SEEN"); 
+                }
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [dropdownRef, bellRef]);
 
     return (
         <div className="header parent">
@@ -58,29 +110,38 @@ function Header() {
                 <img src={logo} alt="Logo" />
             </div>
             <div className="for-bell">
-                <FaBell className="bell-icon" onClick={handleBellClick} />
+                <div ref={bellRef} onClick={handleBellClick}>
+                    <FaBell className="bell-icon" />
+                </div>
                 {showNotifications && (
-                    <div className="notification-dropdown">
+                    <div className="notification-dropdown" ref={dropdownRef}>
                         <ul>
                             {notifications.length === 0 ? (
                                 <li>No notifications</li>
                             ) : (
                                 notifications.map(notification => (
-                                    <li key={notification.id} onClick={() => handleNotificationClick(notification)}>
+                                    <li 
+                                        key={notification.id} 
+                                        onClick={() => handleNotificationClick(notification)}
+                                    >
                                         {notification.type === 'REQUEST' ? (
                                             <>
-                                                A leave request from {notification.leaveRequest.employee.name}
+                                                A new leave request from {notification.leaveRequest.employee.name} has arrived.
                                             </>
                                         ) : (
                                             <>
-                                                Your leave request from {notification.leaveRequest.leaveStartDate} to {notification.leaveRequest.leaveEndDate} has been {notification.leaveRequest.status}
+                                                Your leave request from {notification.leaveRequest.leaveStartDate} to {notification.leaveRequest.leaveEndDate} is now {notification.responseStatus}
                                             </>
                                         )}
                                     </li>
                                 ))
                             )}
                         </ul>
-                        <button onClick={handleClearNotifications}>Clear Notifications</button>
+                        {notifications.length > 0 && ( 
+                            <button type="button" className="clear-button" onClick={handleClearNotifications}>
+                                Clear 
+                            </button>
+                        )}
                     </div>
                 )}
                 <button onClick={handleLogout}>Logout</button>
@@ -90,6 +151,9 @@ function Header() {
 }
 
 export default Header;
+
+
+
 
 
 
