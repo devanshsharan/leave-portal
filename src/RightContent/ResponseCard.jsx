@@ -6,6 +6,10 @@ import { FaCheckCircle } from "react-icons/fa";
 import { GiSkullCrossedBones } from "react-icons/gi";
 import { FcCancel } from "react-icons/fc";
 import { FaAnglesDown,FaAnglesUp } from "react-icons/fa6";
+import { useSelector, useDispatch } from 'react-redux'; 
+import { selectCurrentEmployeeId, selectCurrentToken, logOut } from '../features/auth/authSlice';
+//import useHandleUnauthorizedResponse from '../CustomHooks/useHandleUnauthorizedResponse';
+import useFetchInterceptor from '../CustomHooks/useFetchInterceptor';
 
 function ResponseCard({ response }) {
   const [showResponses, setShowResponses] = useState(false);
@@ -13,11 +17,13 @@ function ResponseCard({ response }) {
   const [overAllLeaveStatus, setOverAllLeaveStatus] = useState(response.leaveRequest.status);
   const [comment, setComment] = useState('');
   const [projects, setProjects] = useState([]);
+  const managerId = useSelector(selectCurrentEmployeeId);
+  const token = useSelector(selectCurrentToken);
+ // const { handleUnauthorizedResponse } = useHandleUnauthorizedResponse();
+ const fetchWithInterceptor = useFetchInterceptor();
 
   useEffect(() => {
     const fetchProjects = async () => {
-      const token = localStorage.getItem('jwt');
-      const managerId = localStorage.getItem('employeeId');
       const employeeId = response.leaveRequest.employee.id;
       console.log(response);
       console.log(employeeId);
@@ -28,14 +34,17 @@ function ResponseCard({ response }) {
       }
 
       try {
-        const fetchResponse = await fetch(
+        const fetchResponse = await fetchWithInterceptor(
           `http://localhost:8081/managerEmployeeProjects/${managerId}/${employeeId}`,
           {
+            credentials: 'include',
             headers: {
-              Authorization: `Bearer ${token}`, 
+              
             },
           }
         );
+       // const isAuthorized = await handleUnauthorizedResponse(fetchResponse);
+       // if (!isAuthorized) return;
 
         if (!fetchResponse.ok) {
           throw new Error(`Error: ${fetchResponse.statusText}`);
@@ -64,8 +73,6 @@ function ResponseCard({ response }) {
   };
 
   const handleClick = async (status) => {
-    const token = localStorage.getItem('jwt');
-    const employeeId = localStorage.getItem('employeeId');
     if (!token) {
       console.error('No token found');
       return;
@@ -73,19 +80,22 @@ function ResponseCard({ response }) {
 
     try {
       const finalComment = comment.trim() === '' ? 'No Comments' : comment;
-      const res = await fetch('http://localhost:8081/respond', {
+      const res = await fetchWithInterceptor('http://localhost:8081/respond', {
         method: 'POST',
+        credentials: 'include',
         headers: {
-          'Authorization': `Bearer ${token}`,
+        
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           leaveRequestId: response.leaveRequest.id,
-          managerId: employeeId,
+          managerId: managerId,
           response: status,
           comments: finalComment,
         }),
       });
+      //const isAuthorized = await handleUnauthorizedResponse(res);
+      //if (!isAuthorized) return;
 
       if (!res.ok) {
         const errorData = await res.json();
@@ -172,9 +182,7 @@ function ResponseCard({ response }) {
               </div>
             </div>
           )}
-          <div className="arrow-icon" onClick={handleToggleResponses}>
-          {showResponses ? <FaAnglesUp /> : <FaAnglesDown />}
-          </div>
+          
         </div>
         <div className="status-boxi">
           <div className="status-boxi1">
@@ -201,6 +209,9 @@ function ResponseCard({ response }) {
             </div>
         </div>
       </div>
+      <div className="arrow-icon1" onClick={handleToggleResponses}>
+          {showResponses ? <FaAnglesUp /> : <FaAnglesDown />}
+      </div>
 
       {showResponses && (
         <div className="big-bulkha">
@@ -220,6 +231,7 @@ function ResponseCard({ response }) {
               <div>
                 {response.leaveRequest.leaveType}
               </div>
+              <div>{response.leaveRequest.leaveDays + " Days"}</div>
             </div>
             <div className="boxi3 boxic">
                 <h6 className="approval-heading">Approval Status:</h6>
@@ -240,7 +252,7 @@ function ResponseCard({ response }) {
                   ))
                 }
             </div>
-            <div className="boxi5 boxic">
+            <div className="boxi5 boxic boxi-final">
               <h6 className="project-heading">Projects</h6>
               {projects.length === 0 ? (
                 <p>No projects found</p>

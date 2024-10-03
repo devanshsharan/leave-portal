@@ -5,12 +5,12 @@ import Home from './Home';
 import Dashboard from './Components/Dashboard';
 import Leaves from './Components/Leaves';
 import LeaveResponse from './Components/LeaveResponse';
-import Teams from './Components/Teams';
-import People from './RightContent/People';
+import { useSelector, useDispatch } from 'react-redux'; 
+import { selectCurrentRole } from './features/auth/authSlice';
+
 
 function App() {
-    const userRole = localStorage.getItem('role');
-    console.log(userRole);
+  const userRole = useSelector(selectCurrentRole);
     
   return (
     <Router>
@@ -18,10 +18,12 @@ function App() {
         <Route path="/" element={<Login />} />
         <Route path="/home" element={<Home />}>
           <Route path="" element={<Dashboard />} />
-          <Route path="leaves" element={<Leaves />} />
-          <Route path="leave-response" element={<LeaveResponse />} />  
-          <Route path="teams" element={<Teams />} />
-          <Route path="people" element={<People />} />
+          {(userRole === 'MANAGER' || userRole === 'EMPLOYEE') && (
+            <Route path="leaves" element={<Leaves />} />
+          )}
+          {(userRole === 'MANAGER' || userRole === 'ADMIN') && (
+            <Route path="leave-response" element={<LeaveResponse />} />
+          )}
         </Route>
       </Routes>
     </Router>
@@ -30,10 +32,3 @@ function App() {
 
 export default App;
 
-/*
-{(userRole === 'MANAGER' || userRole === 'EMPLOYEE') && (
-  <Route path="leaves" element={<Leaves />} />
-)}
-{(userRole === 'MANAGER' || userRole === 'ADMIN') && (
-  <Route path="leave-response" element={<LeaveResponse />} />
-)}*/

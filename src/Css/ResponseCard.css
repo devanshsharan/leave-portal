@@ -108,13 +108,13 @@
     background-color: #f9f9f9; 
   }
   .input-box:disabled {
-    border-color: #ccc; /* or whatever color you prefer */
-    background-color: #f0f0f0; /* optional: change the background color */
+    border-color: #ccc; 
+    background-color: #f0f0f0; 
 }
 
 .input-box:disabled:hover {
-    border-color: #ccc; /* No change on hover */
-    box-shadow: none; /* Remove box shadow */
+    border-color: #ccc; 
+    box-shadow: none; 
 }
   .btn-outline-primary {
     border: 1px solid #007bff;
@@ -137,18 +137,12 @@
     opacity: 0.65;
   }
   
-  .arrow-icon {
-    cursor: pointer;
-    font-size: 1.2em;
-    color: #007bff;
-  }
-  
   .status {
     font-weight: bold;
   }
   
   .response-section {
-    margin: 16px 0; /* Adjusted margins for consistency */
+    margin: 16px 0;
     padding: 16px;
   }
   
@@ -160,13 +154,13 @@
   }
   
   .leaveReason, .response-card > div {
-    margin-right: 16px; /* Added spacing between items */
+    margin-right: 16px; 
   }
   
   .date-box {
     display: flex;
     flex-direction: column;
-    gap: 4px; /* Reduced gap for tighter alignment */
+    gap: 4px; 
   }
   
   .date {
@@ -184,7 +178,7 @@
   .boxi2{
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 5px;
     align-items: center;
     margin-top: 33px;
     padding-right: 5%;
@@ -221,7 +215,7 @@
     justify-content: center;
   }
   .leave-heading{
-    margin-left: 90px;
+    margin-left: 9%;
     color: green;
   }
   .approval-heading{
@@ -235,4 +229,93 @@
     gap: 15px;
     align-items: center;
   }
+   
+  .arrow-icon1 {
+    cursor: pointer;
+    font-size: 1.2em;
+    color: #007bff;
+    display: flex;
+    justify-content: center;
+    margin-top: 1%;
+    margin-right: 8%;
+  }
+
+  @media (max-width: 1440px) {
+    .arrow-icon1 {
+      cursor: pointer;
+      font-size: 1.2em;
+      color: #007bff;
+      display: flex;
+      justify-content: center;
+      margin-top: 2%;
+      margin-right: 13%;
+    }
+  } 
   
+  @media (max-width: 1024px) {
+    .button2 {
+      width: 200px;
+    }
+    .button-box1{
+      margin-top: 10%;
+      margin-left: 25%;;
+    }
+    .button5{
+      width: 50%;
+    }
+    .arrow-icon1{
+      margin-left: -3%;
+    }
+    .input-box{
+      margin-left: 29%;
+      width: 75%;
+    }
+    .button-box{
+      margin-left: 30%;
+    }
+  }
+  @media (max-width: 768px) {
+    .boxi-final{
+      display: none;
+    }
+    .arrow-icon1{
+      margin-left: 13%;
+    }
+  }
+  @media (max-width: 425px) {
+    .boxi1{
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .button-box1{
+      margin-top: 10%;
+      margin-left: 8%;;
+    }
+    .arrow-icon1{
+      margin-left: 10%;
+    }
+    .input-box{
+      margin-left: 15%;
+      width: 75%;
+    }
+    .button-box{
+      margin-left: 15%;
+    }
+    .button5{
+      width: 42%;
+    }
+
+  }
+  @media (max-width: 375px) {
+    .boxi1{
+      margin-left: -7%;
+    }
+
+  }
+  @media (max-width: 320px) {
+    .boxi1{
+      margin-left: -20%;
+    }
+
+  }

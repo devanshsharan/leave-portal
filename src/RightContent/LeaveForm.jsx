@@ -9,7 +9,6 @@ function LeaveForm({ handleSubmit, setFormData, formData, showModal, setShowModa
         }));
     };
 
-    // Close the modal if the user clicks outside of it
     useEffect(() => {
         const handleOutsideClick = (event) => {
             if (event.target.classList.contains('modal')) {

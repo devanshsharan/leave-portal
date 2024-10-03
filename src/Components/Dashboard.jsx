@@ -1,15 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import '../Css/Dashboard.css'; 
+import { useSelector, useDispatch } from 'react-redux'; 
+import { selectCurrentEmployeeId, selectCurrentToken, logOut } from '../features/auth/authSlice';
+import useFetchInterceptor from '../CustomHooks/useFetchInterceptor';
+
 
 function Dashboard() {
   const [employee, setEmployee] = useState(null);
   const [error, setError] = useState(null);
   const [currentDate, setCurrentDate] = useState(new Date());
-
+  const employeeId = useSelector(selectCurrentEmployeeId);
+  const token = useSelector(selectCurrentToken);
+  const fetchWithInterceptor = useFetchInterceptor();
   useEffect(() => {
     const fetchEmployeeDetails = async () => {
-      const token = localStorage.getItem('jwt'); 
-      const employeeId = localStorage.getItem('employeeId');
 
       if (!token) {
         setError('No token found');
@@ -17,10 +21,11 @@ function Dashboard() {
       }
 
       try {
-        const response = await fetch(`http://localhost:8081/employees/${employeeId}`, { 
+        const response = await fetchWithInterceptor(`http://localhost:8081/employees/${employeeId}`, { 
           method: 'GET',
+          credentials: 'include',
           headers: {
-            'Authorization': `Bearer ${token}`,
+            
             'Content-Type': 'application/json',
           },
         });

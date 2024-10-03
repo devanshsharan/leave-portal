@@ -3,6 +3,10 @@ import '../Css/Leaves.css';
 import LeaveCard from '../RightContent/LeaveCard';
 import Pagination from '../RightContent/Pagination';
 import LeaveForm from '../RightContent/LeaveForm';
+import { useSelector, useDispatch } from 'react-redux'; 
+import { selectCurrentEmployeeId, selectCurrentToken, logOut, setCredentials } from '../features/auth/authSlice';
+import useFetchInterceptor from '../CustomHooks/useFetchInterceptor';
+import { clearLeaveRequestId } from '../features/auth/leaveSlice';
 
 function Leaves() {
     const [leaveDetails, setLeaveDetails] = useState(null);
@@ -22,11 +26,14 @@ function Leaves() {
         leaveReason: ''
     });
     const [flag, setFlag] = useState(false);
+    const dispatch = useDispatch();
+    const employeeId = useSelector(selectCurrentEmployeeId);
+    const token = useSelector(selectCurrentToken);
+    const fetchWithInterceptor = useFetchInterceptor();
+    const leaveRequestId = useSelector((state) => state.leave.leaveRequestId);
 
     useEffect(() => {
         const fetchData = async () => {
-            const token = localStorage.getItem('jwt');
-            const employeeId = localStorage.getItem('employeeId');
 
             if (!token) {
                 setError('No token found');
@@ -40,25 +47,32 @@ function Leaves() {
             }));
 
             try {
-                const detailsResponse = await fetch(`http://localhost:8081/totalLeave/${employeeId}`, { 
+                const detailsResponse = await fetchWithInterceptor(`http://localhost:8081/totalLeave/${employeeId}`, { 
                     method: 'GET',
+                    credentials: 'include',
                     headers: {
-                        'Authorization': `Bearer ${token}`,
+                        
                         'Content-Type': 'application/json',
                     },
                 });
-
+                
                 if (!detailsResponse.ok) {
                     throw new Error('Failed to fetch leave details');
                 }
 
                 const detailsData = await detailsResponse.json();
+                console.log(detailsData);
                 setLeaveDetails(detailsData);
 
-                const requestsResponse = await fetch(`http://localhost:8081/leaveRequestList/${employeeId}/${offset}/${pageSize}`, {
+                const requestsUrl = leaveRequestId
+                    ? `http://localhost:8081/leaveRequestList/${employeeId}/${offset}/${pageSize}?leaveRequestId=${leaveRequestId}`
+                    : `http://localhost:8081/leaveRequestList/${employeeId}/${offset}/${pageSize}`;
+
+                const requestsResponse = await fetchWithInterceptor(requestsUrl, {
                     method: 'GET',
+                    credentials: 'include',
                     headers: {
-                        'Authorization': `Bearer ${token}`,
+                     
                         'Content-Type': 'application/json',
                     },
                 });
@@ -80,6 +94,9 @@ function Leaves() {
                 setError(err.message);
             } finally {
                 setLoading(false);
+                if (leaveRequestId) {
+                    dispatch(clearLeaveRequestId());
+                }
             }
         };
 
@@ -89,13 +106,13 @@ function Leaves() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const token = localStorage.getItem('jwt');
 
         try {
-            const response = await fetch('http://localhost:8081/apply', {
+            const response = await fetchWithInterceptor('http://localhost:8081/apply', {
                 method: 'POST',
+                credentials: 'include',
                 headers: {
-                    'Authorization': `Bearer ${token}`,
+                   
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify(formData)

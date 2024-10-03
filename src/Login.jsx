@@ -1,15 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Css/Loginpage.css';
+import { useSelector, useDispatch } from 'react-redux'; 
+import { selectCurrentToken, setCredentials } from './features/auth/authSlice';
+import CryptoJS from "crypto-js";
 
-function Login  () {
+function Login() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const jwt = useSelector(selectCurrentToken);
+  const iv = CryptoJS.lib.WordArray.random(16);
+  const secretKey = import.meta.env.VITE_SECRET_KEY;
+
 
   useEffect(() => {
-    const jwt = localStorage.getItem('jwt');
     if (jwt) {
       navigate('/home');
     }
@@ -17,38 +24,63 @@ function Login  () {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-  
+
     if (!username || !password) {
       setError('Both fields are required.');
       alert('Both fields are required');
       return;
     }
-  
+
+    const encryptedPassword = CryptoJS.AES.encrypt(
+      password,
+      CryptoJS.enc.Utf8.parse(secretKey),
+      {
+        iv: iv, 
+        mode: CryptoJS.mode.CBC, 
+        padding: CryptoJS.pad.Pkcs7, 
+      }
+    );
+
+   
+    const encryptedData = iv.concat(encryptedPassword.ciphertext); 
+
+   
+    const encryptedDataBase64 = encryptedData.toString(CryptoJS.enc.Base64);
+    console.log(encryptedDataBase64);
+    
+    
+
     try {
+      console.log(encryptedDataBase64);
       const response = await fetch('http://localhost:8081/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password }),
+        credentials: 'include',
+        body: JSON.stringify({ username: username, password: encryptedDataBase64 }),
       });
-  
-      if (!response.ok) throw new Error('Invalid username or password');
-  
+      console.log(response);
+
+    
+      if (!response.ok) {
+        const errorData = await response.json(); 
+        throw new Error(errorData.message || 'Login failed. Please try again.'); 
+      }
+
       const data = await response.json(); 
+      dispatch(setCredentials({
+        role: data.role,
+        employeeId: data.employeeId,
+        accessToken: data.jwt
+      }));
       console.log(data); 
-      
-      localStorage.setItem('jwt', data.jwt);
-      localStorage.setItem('refreshToken', data.refreshToken);
-      localStorage.setItem('role', data.role);
-      localStorage.setItem('employeeId', data.employeeId); 
-      console.log(localStorage.getItem('employeeId')); 
-  
+      console.log(localStorage.getItem('employeeId'));
+
       navigate('/home');
     } catch (err) {
-      setError(err.message);
-      alert(err.message);
+      setError(err.message); 
+      alert(err.message); 
     }
   };
-  
 
   return (
     <div className="loginpage">
@@ -77,6 +109,6 @@ function Login  () {
       </form>
     </div>
   );
-};
+}
 
 export default Login;

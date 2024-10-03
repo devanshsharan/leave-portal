@@ -2,7 +2,10 @@ import React, { useState, useEffect } from 'react';
 import ResponseCard from '../RightContent/ResponseCard';
 import Pagination from '../RightContent/Pagination';
 import '../Css/LeaveResponse.css';
-
+import { useSelector, useDispatch } from 'react-redux'; 
+import { selectCurrentEmployeeId, selectCurrentToken, logOut } from '../features/auth/authSlice';
+import useFetchInterceptor from '../CustomHooks/useFetchInterceptor';
+import { clearLeaveRequestId } from '../features/auth/leaveSlice';
 
 function LeaveResponse() {
     const [responses, setResponses] = useState([]);
@@ -12,12 +15,14 @@ function LeaveResponse() {
     const [pageSize, setPageSize] = useState(5);
     const [totalPages, setTotalPages] = useState(1);
     const [currentPage, setCurrentPage] = useState(1);
-
-    const managerId = localStorage.getItem('employeeId');
+    const managerId = useSelector(selectCurrentEmployeeId);
+    const token = useSelector(selectCurrentToken);
+    const fetchWithInterceptor = useFetchInterceptor();
+    const dispatch = useDispatch();
+    const leaveRequestId = useSelector((state) => state.leave.leaveRequestId);
 
     useEffect(() => {
         const fetchResponses = async () => {
-            const token = localStorage.getItem('jwt');
 
             if (!token) {
                 setError('No token found. Please login.');
@@ -32,10 +37,15 @@ function LeaveResponse() {
             }
 
             try {
-                const response = await fetch(`http://localhost:8081/manager/${managerId}/${offset}/${pageSize}`, {
+                const requestsUrl = leaveRequestId
+                    ? `http://localhost:8081/manager/${managerId}/${offset}/${pageSize}?leaveRequestId=${leaveRequestId}`
+                    : `http://localhost:8081/manager/${managerId}/${offset}/${pageSize}`;
+
+                const response = await fetchWithInterceptor(requestsUrl, {
                     method: 'GET',
+                    credentials: 'include',
                     headers: {
-                        'Authorization': `Bearer ${token}`,
+                       
                         'Content-Type': 'application/json',
                     },
                 });
@@ -55,6 +65,9 @@ function LeaveResponse() {
                 console.error('Error:', error);
             } finally {
                 setLoading(false);
+                if (leaveRequestId) {
+                    dispatch(clearLeaveRequestId());
+                }
             }
         };
 

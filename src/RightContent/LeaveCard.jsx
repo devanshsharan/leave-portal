@@ -6,7 +6,10 @@ import { FaCheckCircle } from "react-icons/fa";
 import { GiSkullCrossedBones } from "react-icons/gi";
 import { FcCancel } from "react-icons/fc";
 import { FaAnglesDown,FaAnglesUp } from "react-icons/fa6";
+import { useSelector, useDispatch } from 'react-redux'; 
+import { selectCurrentEmployeeId, selectCurrentToken, logOut } from '../features/auth/authSlice';
 import useFetchManagerResponses from '../CustomHooks/useFetchManagerResponses';
+import useFetchInterceptor from '../CustomHooks/useFetchInterceptor';
 
 function LeaveCard({ leave }) {
     const [leaveDynamic, setLeaveDynamic] = useState(leave);
@@ -16,6 +19,8 @@ function LeaveCard({ leave }) {
     const [isCancelled, setIsCancelled] = useState(false);
     const [showModal, setShowModal] = useState(false);
     const [flag, setFlag] = useState(false);
+    const employeeId = useSelector(selectCurrentEmployeeId);
+    const token = useSelector(selectCurrentToken);
     const [formData, setFormData] = useState({
         leaveRequestId: '',
         leaveStartDate: '',
@@ -23,7 +28,7 @@ function LeaveCard({ leave }) {
         leaveType: '',
         leaveReason: ''
     });
-
+    const fetchWithInterceptor = useFetchInterceptor();
     const { managerResponses, error, loading, fetchManagerResponses } = useFetchManagerResponses();
 
     useEffect(() => {
@@ -120,17 +125,18 @@ function LeaveCard({ leave }) {
     };
 
     const handleCancel = async () => {
-        const token = localStorage.getItem('jwt');
+        
         if (!token) {
             setError1('No token found');
             return;
         }
 
         try {
-            const response = await fetch('http://localhost:8081/cancel', {
+            const response = await fetchWithInterceptor('http://localhost:8081/cancel', {
                 method: 'POST',
+                credentials: 'include',
                 headers: {
-                    'Authorization': `Bearer ${token}`,
+                  
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({ leaveRequestId: leave.id })
@@ -150,17 +156,18 @@ function LeaveCard({ leave }) {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const token = localStorage.getItem('jwt');
 
         try {
-            const response = await fetch('http://localhost:8081/reschedule', {
+            const response = await fetchWithInterceptor('http://localhost:8081/reschedule', {
                 method: 'POST',
+                credentials: 'include',
                 headers: {
-                    'Authorization': `Bearer ${token}`,
+                   
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify(formData)
             });
+      
 
             if (!response.ok) {
                 const errorData = await response.json();
@@ -223,9 +230,7 @@ function LeaveCard({ leave }) {
                         </button>
                     </div>
                     
-                    <div className="arrow-icon" onClick={handleToggleResponses}>
-                        {showResponses ? <FaAnglesUp /> : <FaAnglesDown />}
-                    </div>
+                   
                 </div>
                 <div className={`icons-design status ${isCancelled ? 'cancelled' : leaveDynamic.status.toLowerCase()}`}>
                      <span>
@@ -236,6 +241,9 @@ function LeaveCard({ leave }) {
                      </span>
                 </div>
 
+            </div>
+            <div className="arrow-icon2" onClick={handleToggleResponses}>
+                        {showResponses ? <FaAnglesUp /> : <FaAnglesDown />}
             </div>
 
             {showResponses && (
@@ -255,12 +263,12 @@ function LeaveCard({ leave }) {
                                 <div key={index} className="response-card1">
                                     <div className="response-inside1">
                                         <div>{response.manager.name}</div>
-                                        <div>{isCancelled ? 'No Comments' :response.comments}</div>
+                                        <div className="leave-comments">{isCancelled ? 'No Comments' :response.comments}</div>
                                         <div className={`icons-design status ${isCancelled ? 'cancelled' : response.response.toLowerCase()}`}>
                                              <span>
                                                  {isCancelled ? 'CANCELLED' : response.response}
                                              </span>
-                                             <span>
+                                             <span className="response-icon-hi">
                                                  {getResponseIcon(isCancelled ? 'CANCELLED' : response.response)}
                                              </span>
                                         </div>

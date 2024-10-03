@@ -1,12 +1,18 @@
 import { useState, useCallback } from 'react';
+import { useSelector, useDispatch } from 'react-redux'; 
+import { selectCurrentEmployeeId, selectCurrentToken, logOut } from '../features/auth/authSlice';
+
+import useFetchInterceptor from './useFetchInterceptor';
 
 const useFetchManagerResponses = () => {
     const [managerResponses, setManagerResponses] = useState([]);
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(true);
+    const token = useSelector(selectCurrentToken);
+  
+    const fetchWithInterceptor = useFetchInterceptor();
 
     const fetchManagerResponses = useCallback(async (leaveId) => {
-        const token = localStorage.getItem('jwt');
         setLoading(true); 
 
         if (!token) {
@@ -16,13 +22,15 @@ const useFetchManagerResponses = () => {
         }
 
         try {
-            const response = await fetch(`http://localhost:8081/managerResponseList/${leaveId}`, {
+            const response = await fetchWithInterceptor(`http://localhost:8081/managerResponseList/${leaveId}`, {
                 method: 'GET',
+                credentials: 'include',
                 headers: {
-                    'Authorization': `Bearer ${token}`,
+                    
                     'Content-Type': 'application/json',
                 },
             });
+           
 
             if (!response.ok) {
                 throw new Error('Failed to fetch manager responses');

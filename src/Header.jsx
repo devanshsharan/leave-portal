@@ -3,85 +3,154 @@ import { useNavigate } from 'react-router-dom';
 import './Css/Header.css';
 import logo from './assets/beehyvlogo.png';
 import { FaBell } from "react-icons/fa";
+import { useSelector, useDispatch } from 'react-redux'; 
+import { selectCurrentEmployeeId, selectCurrentRole, selectCurrentToken, logOut, setCredentials } from './features/auth/authSlice';
+import useFetchInterceptor from './CustomHooks/useFetchInterceptor';
+import {setLeaveRequestId} from './features/auth/leaveSlice';
+
+const API_BASE_URL = 'http://localhost:8081';
 
 function Header() {
     const navigate = useNavigate(); 
+    const dispatch = useDispatch();
+    const jwtToken = useSelector(selectCurrentToken);
+    const currentRole = useSelector(selectCurrentRole);
+    const employeeId = useSelector(selectCurrentEmployeeId);
+
     const [notifications, setNotifications] = useState([]);
     const [showNotifications, setShowNotifications] = useState(false);
-    const employeeId = localStorage.getItem('employeeId'); 
-    const jwtToken = localStorage.getItem('jwt'); 
+    const [fetchError, setFetchError] = useState(null);
     const dropdownRef = useRef(null);
     const bellRef = useRef(null);
+    const fetchWithInterceptor = useFetchInterceptor();
+  
 
-    const handleLogout = () => {
-        localStorage.removeItem('jwt');
-        localStorage.removeItem('refreshToken');
-        localStorage.removeItem('role');
-        localStorage.removeItem('employeeId');
-        navigate('/');
-    };
-
-    const fetchNotifications = async () => {
+    const handleLogout = async () => {
         try {
-            const response = await fetch(`http://localhost:8081/uncleared/${employeeId}`, {
-                method: 'GET',
+            const response = await fetch('http://localhost:8081/deleteCookie', {
+                method: 'POST', 
+                credentials: 'include', 
                 headers: {
-                    'Authorization': `Bearer ${jwtToken}`, 
-                    'Content-Type': 'application/json'
-                }
+                    'Content-Type': 'application/json',
+                },
             });
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
+    
+            if (response.ok) {
+                dispatch(logOut());  
+                navigate('/');  
+                console.log("Logout successful");
+            } else {
+                console.log('Failed to log out');
             }
-            const data = await response.json();
-            setNotifications(data); 
         } catch (error) {
-            console.error("Error fetching notifications:", error);
+            console.log('Logout error:', error);
         }
     };
 
+    const loadNotifications = async () => {
+        try {
+            if (employeeId && jwtToken) {
+                const response = await fetchWithInterceptor(`${API_BASE_URL}/uncleared/${employeeId}`, {
+                    method: 'GET',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Failed to fetch notifications');
+                }
+
+                const notificationsData = await response.json();
+                setNotifications(notificationsData);
+            }
+        } catch (error) {
+            setFetchError('Error fetching notifications');
+            console.error(error);
+        }
+    };
+
+ 
+    useEffect(() => {
+        loadNotifications();
+    }, [employeeId, jwtToken]);
+
+    useEffect(() => {
+        let pollingInterval;
+    
+        const startPolling = () => {
+            pollingInterval = setInterval(() => {
+                loadNotifications();
+            }, 10000);  
+        };
+    
+        if (employeeId && jwtToken) {
+            loadNotifications(); 
+            startPolling();     
+        }
+    
+        return () => {
+            if (pollingInterval) {
+                clearInterval(pollingInterval); 
+            }
+        };
+    }, [employeeId, jwtToken]);
+    
+
+
     const postStatusUpdate = async (status) => {
         try {
-            const response = await fetch('http://localhost:8081/updateStatus', {
+            const response = await fetchWithInterceptor('http://localhost:8081/updateStatus', {
                 method: 'POST',
+                credentials: 'include',
                 headers: {
-                    'Authorization': `Bearer ${jwtToken}`,
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({
-                    employeeId: employeeId,
-                    response: status
-                })
+                body: JSON.stringify({ employeeId, response: status }),
             });
+            if (status === 'SEEN') {
+                setNotifications((prevNotifications) => 
+                    prevNotifications.map(notification => ({
+                        ...notification,
+                        status: 'SEEN',
+                    }))
+                );
+            }
 
             if (!response.ok) {
-                throw new Error('Failed to update notification status');
+                throw new Error('Failed to fetch notifications');
             }
-            const result = await response.text();
-            console.log(result);
         } catch (error) {
             console.error("Error sending status update:", error);
         }
     };
 
     const handleBellClick = () => {
-        if (!showNotifications) {
-            fetchNotifications();
-        } else if(notifications.length > 0){
+        if (notifications.length > 0) {
             postStatusUpdate("SEEN");
         }
         setShowNotifications(prev => !prev);
     };
 
     const handleClearNotifications = async () => {
-        if (notifications.length > 0) { 
+        if (notifications.length > 0) {
+            await postStatusUpdate("CLEARED");
             setNotifications([]); 
-            await postStatusUpdate("CLEARED"); 
         }
     };
 
+ 
     const handleNotificationClick = (notification) => {
-        console.log(`Notification clicked: ${notification.id}`);
+        console.log(notification);
+        dispatch(setLeaveRequestId(notification.leaveRequest.id));
+        if (notification.type === 'RESPONSE') {
+            navigate('/home/leaves');
+        }
+        else{
+            navigate('/home/leave-response');
+        }
+        setShowNotifications(prev => !prev);
     };
 
     useEffect(() => {
@@ -91,27 +160,50 @@ function Header() {
                 bellRef.current && !bellRef.current.contains(event.target)
             ) {
                 setShowNotifications(false);
-                if(notifications.length > 0){
-                    postStatusUpdate("SEEN"); 
+                if (notifications.length > 0) {
+                    postStatusUpdate("SEEN");
                 }
             }
         };
 
         document.addEventListener('mousedown', handleClickOutside);
-
         return () => {
             document.removeEventListener('mousedown', handleClickOutside);
         };
-    }, [dropdownRef, bellRef]);
+    }, [notifications]);
+
+    const formatDate = (date) => {
+        const options = { day: 'numeric', month: 'short' };
+        return new Date(date).toLocaleDateString('en-US', options);
+    };
+    
+    const formatLeaveDateRange = (startDate, endDate) => {
+        const start = formatDate(startDate);
+        const end = formatDate(endDate);
+        
+      
+        if (start === end) {
+            return start; 
+        } else {
+            return `${start} - ${end} ${new Date(endDate).getFullYear()}`;
+        }
+    };
+    
+    
 
     return (
         <div className="header parent">
             <div>
                 <img src={logo} alt="Logo" />
             </div>
-            <div className="for-bell">
-                <div ref={bellRef} onClick={handleBellClick}>
+            <div className="for-bell final-touch">
+                <div ref={bellRef} onClick={handleBellClick} className="notification-icon-wrapper">
                     <FaBell className="bell-icon" />
+                    {notifications.filter(notification => notification.status === 'UNSEEN').length > 0 && (
+                        <span className="notification-badge">
+                            {notifications.filter(notification => notification.status === 'UNSEEN').length}
+                        </span>
+                    )}
                 </div>
                 {showNotifications && (
                     <div className="notification-dropdown" ref={dropdownRef}>
@@ -126,11 +218,12 @@ function Header() {
                                     >
                                         {notification.type === 'REQUEST' ? (
                                             <>
-                                                A new leave request from {notification.leaveRequest.employee.name} has arrived.
+                                                A new leave request from {notification.leaveRequest?.employee?.name+" "} 
+                                                 on {formatLeaveDateRange(notification.leaveRequest?.leaveStartDate, notification.leaveRequest?.leaveEndDate)} has arrived.
                                             </>
                                         ) : (
                                             <>
-                                                Your leave request from {notification.leaveRequest.leaveStartDate} to {notification.leaveRequest.leaveEndDate} is now {notification.responseStatus}
+                                                Your leave request on {formatLeaveDateRange(notification.leaveRequest?.leaveStartDate, notification.leaveRequest?.leaveEndDate)} is now {notification.responseStatus}.
                                             </>
                                         )}
                                     </li>
@@ -144,16 +237,11 @@ function Header() {
                         )}
                     </div>
                 )}
-                <button onClick={handleLogout}>Logout</button>
+                <button className="final-touch" onClick={handleLogout}>Logout</button>
             </div>
         </div>
     );
 }
 
 export default Header;
-
-
-
-
-
 

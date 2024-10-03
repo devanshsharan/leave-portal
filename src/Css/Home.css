@@ -17,7 +17,7 @@
     top: 0;
     left: 0;
     right: 0;
-    height: 80px; 
+    height: 100px; 
     z-index: 1000; 
 }
 
@@ -34,9 +34,52 @@
 
 
 .content {
+    
     grid-area: content;
     overflow-y: auto; 
     height: calc(100vh - 80px); 
     
 }
 
+@media (max-width: 768px) {
+    .header {
+        height: 80px; 
+    }
+    
+    .layout {
+        grid-template-areas:
+          "header header"
+          "content content"; 
+        grid-template-columns: 1fr;
+    }
+
+    .content {
+        padding-left: 0; 
+    }
+
+    .sidebar {
+        transform: translateX(-100%); 
+        width: 40%; 
+    }
+
+    .sidebar.open {
+        transform: translateX(0); 
+    }
+
+    .hamburger {
+        display: block;
+        position: absolute;
+        top: 25px;
+        left: 15px;
+        font-size: 24px;
+        cursor: pointer;
+        z-index: 1001;
+        margin-left: 5%
+    }
+}
+@media (max-width: 425px) {
+    .sidebar {
+        transform: translateX(-100%); 
+        width: 60%; 
+    }
+}
