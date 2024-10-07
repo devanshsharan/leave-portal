@@ -27,6 +27,7 @@ function LeaveResponse() {
   const [flag2, setFlag2] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
+  const [leaveCount, setLeaveCount] = useState(0);
 
   useEffect(() => {
     if (leaveRequestId) {
@@ -87,6 +88,7 @@ function LeaveResponse() {
           console.log("thisone" + data);
           setResponses(data.content);
           setTotalPages(data.totalPages);
+          setLeaveCount(data.totalElements);
           setError(null);
         }
       } catch (error) {
@@ -133,8 +135,13 @@ function LeaveResponse() {
             <option value="rejected">Rejected</option>
           </select>
           <div className="pending-notification">
-            <div className="circle">5</div>
-            <span>Pending</span>
+            <div className="circle">{leaveCount}</div>
+            <span>
+              {statusFilter === "pending" && "PENDING"}
+              {statusFilter === "approved" && "APPROVED"}
+              {statusFilter === "rejected" && "REJECTED"}
+              {!statusFilter && "TOTAL"}
+            </span>
           </div>
         </div>
       </div>
@@ -142,7 +149,11 @@ function LeaveResponse() {
         <div>
           <div className="history-columns">
             {responses.map((response) => (
-              <ResponseCard key={response.id} response={response} />
+              <ResponseCard
+                key={response.id}
+                response={response}
+                setFlag2={setFlag2}
+              />
             ))}
           </div>
           <Pagination
