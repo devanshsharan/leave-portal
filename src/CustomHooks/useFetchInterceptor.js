@@ -46,6 +46,7 @@ const useFetchInterceptor = () => {
             return data.jwt;
         } else {
             dispatch(logOut());
+            navigate('/');
             return null;
         }
     };
