@@ -8,7 +8,6 @@ import { FcCancel } from "react-icons/fc";
 import { FaAnglesDown,FaAnglesUp } from "react-icons/fa6";
 import { useSelector, useDispatch } from 'react-redux'; 
 import { selectCurrentEmployeeId, selectCurrentToken, logOut } from '../features/auth/authSlice';
-//import useHandleUnauthorizedResponse from '../CustomHooks/useHandleUnauthorizedResponse';
 import useFetchInterceptor from '../CustomHooks/useFetchInterceptor';
 
 function ResponseCard({ response }) {
@@ -19,7 +18,6 @@ function ResponseCard({ response }) {
   const [projects, setProjects] = useState([]);
   const managerId = useSelector(selectCurrentEmployeeId);
   const token = useSelector(selectCurrentToken);
- // const { handleUnauthorizedResponse } = useHandleUnauthorizedResponse();
  const fetchWithInterceptor = useFetchInterceptor();
 
   useEffect(() => {
@@ -43,9 +41,7 @@ function ResponseCard({ response }) {
             },
           }
         );
-       // const isAuthorized = await handleUnauthorizedResponse(fetchResponse);
-       // if (!isAuthorized) return;
-
+  
         if (!fetchResponse.ok) {
           throw new Error(`Error: ${fetchResponse.statusText}`);
         }
@@ -94,8 +90,7 @@ function ResponseCard({ response }) {
           comments: finalComment,
         }),
       });
-      //const isAuthorized = await handleUnauthorizedResponse(res);
-      //if (!isAuthorized) return;
+   
 
       if (!res.ok) {
         const errorData = await res.json();

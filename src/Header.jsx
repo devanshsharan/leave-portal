@@ -82,7 +82,7 @@ function Header() {
         const startPolling = () => {
             pollingInterval = setInterval(() => {
                 loadNotifications();
-            }, 10000);  
+            }, 60000);  
         };
     
         if (employeeId && jwtToken) {

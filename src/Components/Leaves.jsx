@@ -31,6 +31,11 @@ function Leaves() {
     const token = useSelector(selectCurrentToken);
     const fetchWithInterceptor = useFetchInterceptor();
     const leaveRequestId = useSelector((state) => state.leave.leaveRequestId);
+    useEffect(() => {
+        if (leaveRequestId) {
+            setFlag(prevFlag => !prevFlag);  
+        }
+    }, [leaveRequestId]);
 
     useEffect(() => {
         const fetchData = async () => {
