@@ -13,7 +13,7 @@
   
   .leave-card {
     width: 35%;
-    background-color: #f8f9fa;
+    background-color: #f8f8f8;
     padding: 2%;
     padding-left: 4%;
     padding-right: 4%;
@@ -73,7 +73,7 @@
   }
   
   .history-card {
-    background-color: #f8f9fa;
+    background-color: #ffffff;
     padding: 15px;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);

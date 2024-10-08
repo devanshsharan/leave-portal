@@ -7,12 +7,13 @@
     grid-template-columns: 250px 1fr;
     height: 100vh;
     overflow: hidden; 
+    background-color: #ffffff;
     
 }
 
 .header {
     grid-area: header;
-    background-color: #FFFFFF;
+    background-color: #ffffff;
     position: fixed; 
     top: 0;
     left: 0;
@@ -23,7 +24,6 @@
 
 .sidebar {
     grid-area: sidebar;
-    background-color: #F0F0F0;
     position: fixed; 
     top: 80px; 
     left: 0;

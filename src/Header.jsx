@@ -83,6 +83,35 @@ function Header() {
     loadNotifications();
   }, [employeeId, jwtToken]);
 
+  /*useEffect(() => {
+    loadNotifications();
+
+    // Listen for 'leaveApplied' events
+    socket.on("leaveApplied", () => {
+      loadNotifications(); // Reload notifications when a leave is applied
+    });
+
+    return () => {
+      socket.off("leaveApplied"); // Cleanup the event listener on unmount
+    };
+  }, [employeeId, jwtToken]);*/
+
+  /*useEffect(() => {
+    const socket = io("http://localhost:8082");
+
+    socket.emit("join", employeeId);
+
+    socket.on("newNotification", () => {
+      loadNotifications();
+    });
+
+    loadNotifications();
+
+    return () => {
+      socket.disconnect();
+    };
+  }, [employeeId, jwtToken]);*/
+
   useEffect(() => {
     let pollingInterval;
 
