@@ -19,7 +19,6 @@ const useFetchInterceptor = () => {
         try {
             const decoded = jwtDecode(token);
             const expiryTime = decoded.exp * 1000; 
-            console.log(expiryTime);
             return Date.now() > expiryTime;
         } catch (error) {
             console.error("Error decoding token:", error);
@@ -52,9 +51,7 @@ const useFetchInterceptor = () => {
     };
 
     const fetchWithInterceptor = async (url, options = {}) => {
-        console.log("check1");
         if (isTokenExpired(jwtToken)) {
-            console.log("check2");
             const newToken = await refreshToken();
             if (newToken) {
                 options.headers = {
@@ -65,15 +62,12 @@ const useFetchInterceptor = () => {
                 throw new Error('Unable to refresh token');
             }
         } else {
-            console.log("check3");
             options.headers = {
                 ...options.headers,
                 'Authorization': `Bearer ${jwtToken}`,
             };
         }
-        console.log("check4");
         const response = await fetch(url, options);
-        console.log(response);
         
         if (response.status === 401 || response.status === 403) {
             dispatch(logOut());

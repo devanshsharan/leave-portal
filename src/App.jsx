@@ -25,6 +25,7 @@ function App() {
             <Route path="leave-response" element={<LeaveResponse />} />
           )}
         </Route>
+        <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </Router>
   );

@@ -85,7 +85,6 @@ function LeaveResponse() {
           throw new Error("Failed to fetch leave responses.");
         } else {
           const data = await response.json();
-          console.log("thisone" + data);
           setResponses(data.content);
           setTotalPages(data.totalPages);
           setLeaveCount(data.totalElements);
@@ -93,7 +92,6 @@ function LeaveResponse() {
         }
       } catch (error) {
         setError("Error fetching leave responses.");
-        console.error("Error:", error);
       } finally {
         setLoading(false);
         if (leaveRequestId) {
@@ -123,7 +121,7 @@ function LeaveResponse() {
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
         />
-        <div className="dropdown-notification-container">
+        <div className="dropdown-response-container">
           <select
             className="status-dropdown"
             value={statusFilter}
@@ -134,7 +132,7 @@ function LeaveResponse() {
             <option value="approved">Approved</option>
             <option value="rejected">Rejected</option>
           </select>
-          <div className="pending-notification">
+          <div className="pending-response">
             <div className="circle">{leaveCount}</div>
             <span>
               {statusFilter === "pending" && "PENDING"}

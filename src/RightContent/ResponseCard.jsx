@@ -220,48 +220,58 @@ function ResponseCard({ response, setFlag2 }) {
             <div>{response.leaveRequest.leaveReason}</div>
           </div>
           <div className="boxi1">
-            <div className="boxi2 boxic">
-              <div>
-                {response.leaveRequest.leaveStartDate ===
-                response.leaveRequest.leaveEndDate
-                  ? formatDate(response.leaveRequest.leaveStartDate)
-                  : `${formatDate(
-                      response.leaveRequest.leaveStartDate
-                    )} - ${formatDate(response.leaveRequest.leaveEndDate)}`}
-              </div>
-              <div>{response.leaveRequest.leaveType}</div>
-              <div>{response.leaveRequest.leaveDays + " Days"}</div>
-            </div>
-            <div className="boxi3 boxic">
-              <h6 className="approval-heading">Approval Status:</h6>
-              {managerResponses
-                .filter((resItem) => response.manager.id !== resItem.manager.id)
-                .map((res) => (
-                  <div className="boxi4" key={res.id}>
-                    <div className="boxi-name">
-                      {res.manager.name.split(" ")[0]}
-                    </div>
-                    <div
-                      className={`icons-design status ${res.response.toLowerCase()}`}
-                    >
-                      <span className="boxi-status">{res.response}</span>
-                      <span>{getResponseIcon(res.response)}</span>
-                    </div>
+            {loading ? (
+              <p>Loading manager responses...</p>
+            ) : error ? (
+              <p className="error-message">{error}</p>
+            ) : (
+              <>
+                <div className="boxi2 boxic">
+                  <div>
+                    {response.leaveRequest.leaveStartDate ===
+                    response.leaveRequest.leaveEndDate
+                      ? formatDate(response.leaveRequest.leaveStartDate)
+                      : `${formatDate(
+                          response.leaveRequest.leaveStartDate
+                        )} - ${formatDate(response.leaveRequest.leaveEndDate)}`}
                   </div>
-                ))}
-            </div>
-            <div className="boxi5 boxic boxi-final">
-              <h6 className="project-heading">Projects</h6>
-              {projects.length === 0 ? (
-                <p>No projects found</p>
-              ) : (
-                <ul className="project-list">
-                  {projects.map((project) => (
-                    <div key={project.id}>{project.project.name}</div>
-                  ))}
-                </ul>
-              )}
-            </div>
+                  <div>{response.leaveRequest.leaveType}</div>
+                  <div>{response.leaveRequest.leaveDays + " Days"}</div>
+                </div>
+                <div className="boxi3 boxic">
+                  <h6 className="approval-heading">Approval Status:</h6>
+                  {managerResponses
+                    .filter(
+                      (resItem) => response.manager.id !== resItem.manager.id
+                    )
+                    .map((res) => (
+                      <div className="boxi4" key={res.id}>
+                        <div className="boxi-name">
+                          {res.manager.name.split(" ")[0]}
+                        </div>
+                        <div
+                          className={`icons-design status ${res.response.toLowerCase()}`}
+                        >
+                          <span className="boxi-status">{res.response}</span>
+                          <span>{getResponseIcon(res.response)}</span>
+                        </div>
+                      </div>
+                    ))}
+                </div>
+                <div className="boxi5 boxic boxi-final">
+                  <h6 className="project-heading">Projects</h6>
+                  {projects.length === 0 ? (
+                    <p>No projects found</p>
+                  ) : (
+                    <ul className="project-list">
+                      {projects.map((project) => (
+                        <div key={project.id}>{project.project.name}</div>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              </>
+            )}
           </div>
         </div>
       )}

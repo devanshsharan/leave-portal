@@ -20,7 +20,6 @@ function Header() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const jwtToken = useSelector(selectCurrentToken);
-  const currentRole = useSelector(selectCurrentRole);
   const employeeId = useSelector(selectCurrentEmployeeId);
 
   const [notifications, setNotifications] = useState([]);
@@ -43,12 +42,11 @@ function Header() {
       if (response.ok) {
         dispatch(logOut());
         navigate("/");
-        console.log("Logout successful");
-      } else {
-        console.log("Failed to log out");
       }
     } catch (error) {
       console.log("Logout error:", error);
+      dispatch(logOut());
+      navigate("/");
     }
   };
 
@@ -80,58 +78,20 @@ function Header() {
   };
 
   useEffect(() => {
-    loadNotifications();
-  }, [employeeId, jwtToken]);
-
-  /*useEffect(() => {
-    loadNotifications();
-
-    // Listen for 'leaveApplied' events
-    socket.on("leaveApplied", () => {
-      loadNotifications(); // Reload notifications when a leave is applied
-    });
-
-    return () => {
-      socket.off("leaveApplied"); // Cleanup the event listener on unmount
-    };
-  }, [employeeId, jwtToken]);*/
-
-  /*useEffect(() => {
-    const socket = io("http://localhost:8082");
-
-    socket.emit("join", employeeId);
-
-    socket.on("newNotification", () => {
-      loadNotifications();
-    });
-
-    loadNotifications();
-
-    return () => {
-      socket.disconnect();
-    };
-  }, [employeeId, jwtToken]);*/
-
-  useEffect(() => {
-    let pollingInterval;
-
     const startPolling = () => {
-      pollingInterval = setInterval(() => {
+      const pollingInterval = setInterval(() => {
         loadNotifications();
       }, 60000);
+
+      return () => clearInterval(pollingInterval);
     };
 
     if (employeeId && jwtToken) {
       loadNotifications();
-      startPolling();
+      const cleanupPolling = startPolling();
+      return cleanupPolling;
     }
-
-    return () => {
-      if (pollingInterval) {
-        clearInterval(pollingInterval);
-      }
-    };
-  }, [employeeId, jwtToken]);
+  }, []);
 
   const postStatusUpdate = async (status) => {
     try {

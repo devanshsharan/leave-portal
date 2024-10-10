@@ -73,7 +73,6 @@ function Leaves() {
         }
 
         const detailsData = await detailsResponse.json();
-        console.log(detailsData);
         setLeaveDetails(detailsData);
 
         const requestsUrl = leaveRequestId
@@ -89,16 +88,13 @@ function Leaves() {
         });
 
         if (requestsResponse.status === 204) {
-          console.log("here1");
           setLeaveRequests([]);
         } else if (!requestsResponse.ok) {
-          console.log(here2);
           throw new Error("Failed to fetch leave requests");
         } else {
           const requestsData = await requestsResponse.json();
           setLeaveRequests(requestsData.content);
           setTotalPages(requestsData.totalPages);
-          console.log(requestsData);
         }
       } catch (err) {
         setError(err.message);

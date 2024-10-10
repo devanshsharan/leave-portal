@@ -42,10 +42,8 @@ function Login() {
 
     const encryptedData = iv.concat(encryptedPassword.ciphertext);
     const encryptedDataBase64 = encryptedData.toString(CryptoJS.enc.Base64);
-    console.log(encryptedDataBase64);
 
     try {
-      console.log(encryptedDataBase64);
       const response = await fetch("http://localhost:8081/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -102,6 +100,7 @@ function Login() {
             onChange={(e) => setPassword(e.target.value)}
           />
         </div>
+
         <button type="submit">Login</button>
         {error && <div className="error">{error}</div>}
       </form>

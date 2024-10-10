@@ -34,7 +34,7 @@
     height: 50px;
 }
 
-.dropdown-notification-container {
+.dropdown-response-container {
     display: flex; 
     align-items: center; 
     margin-left: 1%; 
@@ -42,7 +42,7 @@
     width: 100%;
 }
 
-.pending-notification {
+.pending-response {
     display: flex;
     align-items: center;
     height: 50px;
@@ -64,7 +64,7 @@
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); 
 }
 
-.pending-notification span {
+.pending-response span {
     font-weight: 500; 
     margin-left: 5px; 
     text-transform: uppercase; 

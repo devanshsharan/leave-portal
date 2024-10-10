@@ -26,7 +26,6 @@ function LeaveCard({
   const [loading1, setLoading1] = useState(true);
   const [showResponses, setShowResponses] = useState(false);
   const [showModal, setShowModal] = useState(false);
-  const employeeId = useSelector(selectCurrentEmployeeId);
   const token = useSelector(selectCurrentToken);
   const [firstTime, setFirstTime] = useState(false);
   const [formData, setFormData] = useState({

@@ -8,7 +8,6 @@ import { logOut } from "../features/auth/authSlice.js";
 const persistConfig = {
     key: 'root',
     storage,
-    blacklist: ['yourNonSerializableReducer'], 
 };
 
 const persistedAuthReducer = persistReducer(persistConfig, authReducer);
