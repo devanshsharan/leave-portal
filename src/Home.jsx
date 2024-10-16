@@ -30,14 +30,14 @@ function Home() {
   return (
     <div className="layout">
       <Header />
-      {isMobile && (
+      {
         <div
           className="hamburger"
           onClick={() => setSidebarOpen(!isSidebarOpen)}
         >
           <GiHamburgerMenu size={24} />
         </div>
-      )}
+      }
       <Sidebar
         isOpen={isSidebarOpen}
         className={isSidebarOpen ? "open" : "hidden"}

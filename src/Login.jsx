@@ -9,6 +9,7 @@ function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [showGuestOptions, setShowGuestOptions] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const jwt = useSelector(selectCurrentToken);
@@ -17,7 +18,7 @@ function Login() {
 
   useEffect(() => {
     if (jwt) {
-      navigate("/home");
+      navigate(`/home`);
     }
   }, [navigate]);
 
@@ -53,7 +54,6 @@ function Login() {
           password: encryptedDataBase64,
         }),
       });
-      console.log(response);
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -68,13 +68,30 @@ function Login() {
           accessToken: data.jwt,
         })
       );
-      console.log(data);
-      console.log(localStorage.getItem("employeeId"));
 
       navigate("/home");
     } catch (err) {
       setError(err.message);
       alert(err.message);
+    }
+  };
+
+  const handleGuestLogin = (role) => {
+    switch (role) {
+      case "admin":
+        setUsername("admin");
+        setPassword("a@123");
+        break;
+      case "manager":
+        setUsername("sohan");
+        setPassword("s@123");
+        break;
+      case "employee":
+        setUsername("rohan");
+        setPassword("r@123");
+        break;
+      default:
+        break;
     }
   };
 
@@ -103,6 +120,41 @@ function Login() {
 
         <button type="submit">Login</button>
         {error && <div className="error">{error}</div>}
+        <div className="guest">
+          <button
+            type="button"
+            className="guest-login-btn"
+            onClick={() => setShowGuestOptions(!showGuestOptions)}
+          >
+            {showGuestOptions ? "Close" : "Login as Guest"}
+          </button>
+
+          {showGuestOptions && (
+            <div>
+              <button
+                type="button"
+                className="guest-option-btn"
+                onClick={() => handleGuestLogin("admin")}
+              >
+                Guest as Admin
+              </button>
+              <button
+                type="button"
+                className="guest-option-btn"
+                onClick={() => handleGuestLogin("manager")}
+              >
+                Guest as Manager
+              </button>
+              <button
+                type="button"
+                className="guest-option-btn"
+                onClick={() => handleGuestLogin("employee")}
+              >
+                Guest as Employee
+              </button>
+            </div>
+          )}
+        </div>
       </form>
     </div>
   );

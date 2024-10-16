@@ -52,7 +52,7 @@
   .sidebar {
     transform: translateX(-100%);
     position: fixed; 
-    z-index: 100; 
+    z-index: 1010; 
   }
 
   .sidebar.open {
@@ -68,21 +68,21 @@
     border: none;
     font-size: 2rem;
     cursor: pointer;
-    z-index: 101; 
+    z-index: 1009; 
   }
 }
 
 
-@media (min-width: 769px) {
+/*@media (min-width: 769px) {
   .hamburger {
     display: none;
   }
-}
+}*/
 
 @media (min-width: 425px) {
-  .hamburger {
+  /*.hamburger {
     display: none;
-  }
+  }*/
   .sidebar{
     width: 50%;
   }

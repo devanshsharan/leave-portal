@@ -44,10 +44,8 @@ function Dashboard() {
         setError(err.message);
       }
     };
-
     fetchEmployeeDetails();
   }, []);
-
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentDate(new Date());
