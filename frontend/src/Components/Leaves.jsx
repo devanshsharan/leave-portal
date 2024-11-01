@@ -205,7 +205,7 @@ function Leaves() {
             <div className="history-columns">
               {leaveRequests.map((leave, index) => (
                 <LeaveCard
-                  key={index}
+                  key={leave.id}
                   leave={leave}
                   setFlag3={setFlag3}
                   setOffset={setOffset}
