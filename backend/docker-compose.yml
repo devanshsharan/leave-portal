@@ -1,0 +1,42 @@
+version: "3.7"
+
+services:
+  app:
+    build: .
+    ports:
+      - "8081:8081"
+    networks:
+      - s-network
+
+  postgres:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: navin
+      POSTGRES_PASSWORD: 1234
+      POSTGRES_DB: devansh2
+    ports:
+      - 5435:5432
+    networks:
+      - s-network
+    volumes:
+      - postgres-s-data:/var/lib/postgresql/data
+
+#  frontend:
+#    container_name: 37a75107894c
+#    image: reactapp10
+#    build:
+#      context: ../frontend
+#      dockerfile: ../frontend/Dockerfile
+#    ports:
+#      - "5173:5173"
+#    networks:
+#      - s-network
+#    depends_on:
+#      - app
+
+networks:
+  s-network:
+    driver: bridge
+
+volumes:
+  postgres-s-data:
